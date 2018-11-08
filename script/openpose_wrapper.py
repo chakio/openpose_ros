@@ -140,12 +140,12 @@ def startCB(data):
         print "--------------Openpose Picture Start--------------"
         framenum=0
         openpose_start=True
-        picture_start = True
+        picture = True
         status_pub.publish(True)
     elif data.data=="end":
         print "--------------Openpose End--------------"
         openpose_start=False
-        picture_start = False
+        picture = False
 
    
 
