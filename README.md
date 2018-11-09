@@ -11,7 +11,7 @@ RGB-Dカメラを用いることで、関節位置の3次元座標を取得し�
 * OpenPoseの3次元化：PCDの画素マッチングによる３次元座標取得
 * TFの管理：OpenPoseの処理時間の考慮
 * 電源管理：ロボットとPCのバッテリー残量の取得
-* 出力：新規メッセージの作成は、複数PC上でのSubscribeの際手間なので今回はsensor_msgs::Pointcloud2を使用。オリジナルのFieldを定義なためconfidenceなどもやりとり可能
+* 出力：今回はsensor_msgs::Pointcloud2を使用(新規メッセージの作成は複数PC上でのSubscribeの際手間)。オリジナルのFieldを定義なためconfidenceなどもやりとり可能
 
 ### Environment
 * OpenPose : v1.3.0
