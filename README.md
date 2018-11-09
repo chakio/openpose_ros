@@ -1,33 +1,31 @@
 # OpenPose-ROS
-ROS wrapper for [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
+[OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)のラッパーです。
 
-[Original home of this project](https://github.com/solbach/openpose-ros)
+### Description
+ROSにてOpenPoseを用いた関節位置推定を行うためのプログラムです。  
+RGB-Dカメラを用いることで、関節位置の3次元座標を取得しています。  
+他にもいくつか機能がついていますので参考にしてみてください。
 
-## Installation
-### Preliminaries
-1. OpenPose, see [here](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md)
-1. __To avoid _Segmentation fault_ compile OpenPose with OpenCV 3__
+### Feature
+* 想定使用法:ロボットにノートPCを搭載したうえでの、人の3次元関節位置推定
+* OpenPoseの3次元化：PCDの画素マッチングによる３次元座標取得
+* TFの管理：OpenPoseの処理時間の考慮
+* 電源管理：ロボットとPCのバッテリー残量の取得
+* 出力：新規メッセージの作成は、複数PC上でのSubscribeの際手間なので、今回はsensor_msgs::Pointcloud2を使用。オリジナルのFieldを定義なためconfidenceなどもやりとり可能
 
-### OpenPose-ROS
-1. In a catkin workspace do the following steps ([how to create a catkin workspace](http://wiki.ros.org/catkin/Tutorials/create_a_workspace))
-1. ```catkin_make```
+### Environment
+* OpenPose : v1.3.0
+* ROS : kinetic  
 
-## Running
-1. ```source catkin_ws/devel/setup.bash```
-1. ```roscore```
-1. ```rosrun openpose-ros openpose-ros-node```
+* Robot : Toyota HSR
+* PC : Alienware 13
 
-## Tested
-* Ubuntu 16.04 
-* ROS Kinetic
-* CUDA 8.0
-* cuDNN 6.0
-* __OpenCV 3.2__
+### Setup
+* OpenPoseを[インストール方法](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md)に従いインストールした後に、  [Python API](https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/installation.md#python-api)をインストール
 
-## COPYRIGHT NOTICE
+* （C++ APIなどの選択肢もあるが、CV::BridgeなどがOpencvのバージョンなどの問題でうごかなかった）
 
-THIS SOFTWARE IS THE PROPERTY OF ITS AUTHOR MARKUS D. SOLBACH. THE AUTHOR GRANTS PERMISSION TO DISTRIBUTE THE SOFTWARE IN ITS ORIGINAL FORM WITHOUT MODIFICATION. UNDER SUCH CIRCUMSTANCES THE COPYRIGHT NOTICE AND FUNCTIONALITY OF THE SOFTWARE MUST REMAIN ENTIRELY INTACT INCLUDING ALL SYNTACTIC AND SEMANTIC ELEMENTS OF ITS FUNCTION. THE AUTHOR GRANTS A NON-EXLUSIVE LICENSE TO INDIVIDUALS WISHING TO USE THE SOFTWARE FOR NON-PROFIT RESEARCH PURPOSES. THOSE WISHING TO EMPLOY THE SOFTWARE FOR COMMERCIAL OR PROFIT SEEKING ENDEAVORS SHOULD CONTACT THE AUTHOR TO DISCUSS LICENSING.
+* （openpose_wrapper.py というサンプルコードを改変し、ros化したが、スレッドが別れないようにする工夫が必要です。（あやふや））
 
-DERIVATIVE WORKS ARE ALLOWED BY INDIVIDUALS FOR NON-PROFIT RESEARCH PURPOSES. SUCH DERIVATIVE WORKS MAY NOT BE DISTRIBUTED WITHOUT WRITTEN CONSENT OF THE AUTHOR. ANY WORKS THAT USE THE ABOVE SOFTWARE IN WHOLE OR PART FOR A COMMERCIAL APPLICATION MUST OBTAIN A VALID LICENSE FROM THE AUTHOR.
-
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+### Useage
+* ```rosrun openpose_ros openpose_wrapper.py```

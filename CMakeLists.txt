@@ -18,16 +18,13 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
-add_message_files(
-        FILES
-        Bodypart.msg
-        PersonDetection.msg
-)
+#add_message_files(
+#        FILES
+#)
 
-add_service_files( DIRECTORY srv
-        FILES
-        Person.srv
-        )
+#add_service_files( DIRECTORY srv
+#        FILES
+#        )
 
 generate_messages(DEPENDENCIES std_msgs sensor_msgs)
 
