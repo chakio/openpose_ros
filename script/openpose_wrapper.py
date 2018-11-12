@@ -50,12 +50,17 @@ FIELDS = [
     # 点の色(RGB)
     # 赤: 0xff0000, 緑:0x00ff00, 青: 0x0000ff
     PointField(name='rgb', offset=12, datatype=PointField.UINT32, count=1),
+    
     # 独自に定義したフィールド
-    # 例えば点の確からしさとか、観測時刻とか
+    ##　何番目の人か 
     PointField(name='person_num', offset=16, datatype=PointField.FLOAT32, count=1),
+    ##　関節番号
     PointField(name='joint_num', offset=20, datatype=PointField.FLOAT32, count=1),
+    ##　信頼度
     PointField(name='confidence', offset=24, datatype=PointField.FLOAT32, count=1),
+    ##　画素の位置(x)
     PointField(name='image_x', offset=28, datatype=PointField.FLOAT32, count=1),
+    ##　画素の位置(y)
     PointField(name='image_y', offset=32, datatype=PointField.FLOAT32, count=1),
 ]
 ################################################################################
@@ -67,19 +72,16 @@ omni_base   = robot.get('omni_base')
 whole_body  = robot.get('whole_body')
 gripper     = robot.get('gripper')
 tts         = robot.get('default_tts')
-global first
-global getImage
-global getPcd
-global openpose_start
-global subscribedTime
-global picture
-getImage=False
-getPcd=False
-first =True
-openpose_start =False
-picture = False
-interval=0
-starttime=0
+
+subscribedTime  = 0
+getImage        = False
+getPcd          = False
+first           = True
+openpose_start  = False
+picture         = False
+interval        = 0
+starttime       = 0
+
 def generatePcd(keypoints,pcd):
     global subscribedTime
     genPoints=[]
@@ -128,6 +130,7 @@ def pcdCB(data):
     subscribedTime  = rospy.Time.now() 
     interval = rospy.get_time()
     #print (subscribedTime)
+
 def startCB(data):
     global openpose_start
     global picture
@@ -147,7 +150,6 @@ def startCB(data):
         openpose_start=False
         picture = False
 
-   
 
 if __name__ == '__main__':
     global original_image
