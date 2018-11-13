@@ -1,3 +1,4 @@
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 # OpenPose-ROS
 [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)のラッパーです。
 
