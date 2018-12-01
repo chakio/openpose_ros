@@ -1,6 +1,6 @@
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 # OpenPose-ROS
-![result](https://github.com/chakio/openpose_ros/blob/master/media/openpose3D.gif) 
+![result](https://github.com/chakio/openpose_ros/blob/master/media/openpose3D.gif)  
 [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)のラッパーです。
 
 ### Description
