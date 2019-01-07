@@ -28,7 +28,7 @@
 * ```rosrun openpose_ros openpose_wrapper.py```
 
 ## Lisence
-[MIT](https://github.com/chakio/openpose_ros/blob/master/LICENCE)
+[MIT](https://github.com/chakio/openpose_ros/blob/master/LICENSE)
 
 ## Author
 [chakio](https://github.com/chakio)
