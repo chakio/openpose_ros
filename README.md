@@ -27,5 +27,5 @@ RGB-Dカメラを用いることで、関節位置の3次元座標を取得し�
 
 * （openpose_wrapper.py というサンプルコードを改変し、ros化したが、スレッドが別れないようにする工夫が必要です。（あやふや））
 
-### Useage
+### Usage
 * ```rosrun openpose_ros openpose_wrapper.py```
