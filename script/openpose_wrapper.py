@@ -156,7 +156,7 @@ def startCB(data):
 if __name__ == '__main__':
     global original_image
     global picture
-    #rospy.init_node("hsr_ros_openpose")
+    rospy.init_node("hsr_ros_openpose")
     bridge      = CvBridge()
 
     image_sub   = rospy.Subscriber("/camera/rgb/image_raw", Image, imageCB)
