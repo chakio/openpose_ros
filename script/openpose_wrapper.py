@@ -178,7 +178,7 @@ if __name__ == '__main__':
     params["num_gpu_start"] = 0
     params["disable_blending"] = False
     # Ensure you point to the correct path where models are located
-    params["default_model_folder"] ="/home/ytnpc2018b/openpose/models/"
+    params["default_model_folder"] ="/openpose/models/"
     # Construct OpenPose object allocates GPU memory
     openpose = OpenPose(params)
     print "--------------Openpose wakeup--------------"
