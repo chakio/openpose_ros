@@ -2,14 +2,14 @@
 # coding:utf-8
 # From Python
 # It requires OpenCV installed for Python
-import hsrb_interface
+# import hsrb_interface
 import sys
 import math
 import cv2
 import os
 from sys import platform
 import rospy
-from hsrb_interface     import geometry
+# from hsrb_interface     import geometry
 import tf2_ros
 import tf2_py as tf2
 
@@ -26,7 +26,7 @@ import tf
 import datetime
 # Remember to add your installation path here
 # Option a
-dir_path = os.path.dirname("/home/ytnpc2018b/openpose/build/examples")
+dir_path = os.path.dirname("/openpose/build/examples")
 #if pldir_pathatform == "win32": sys.path.append(dir_path + '/../../python/openpose/');
 #sys.path.append('../../python')
 # Option b
@@ -67,11 +67,13 @@ FIELDS = [
 #                             Grobal Definition                                #
 ################################################################################
 # ロボット機能の初期化 ----------------------------------------------------------
+"""
 robot       = hsrb_interface.Robot()
 omni_base   = robot.get('omni_base')
 whole_body  = robot.get('whole_body')
 gripper     = robot.get('gripper')
 tts         = robot.get('default_tts')
+"""
 
 subscribedTime  = 0
 getImage        = False
@@ -186,16 +188,16 @@ if __name__ == '__main__':
     starttime = rospy.get_time()
     while not rospy.is_shutdown():
         if first:
-            tts.say("open pose start")
+            #tts.say("open pose start")
             first = False
         if rospy.get_time()-interval>5:
-            tts.say("カメラ画像が取得できません")
+            #tts.say("カメラ画像が取得できません")
             rospy.sleep(5)
         if rospy.get_time()-starttime>5:
             try:
                 (trans,rot)=tflistener.lookupTransform('/camera_link','/base_link',rospy.Time(0))
             except:
-                tts.say("TFが取得できません")
+                #tts.say("TFが取得できません")
                 rospy.sleep(5)
 
         if getImage and getPcd and openpose_start:
