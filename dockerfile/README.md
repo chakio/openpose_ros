@@ -35,6 +35,7 @@ openposeをROS上で動かすためのdockerfileです。
         ```sh 
         $ docker run --runtime=nvidia --rm nvidia/cuda nvidia-smi
 * openpose_rosパッケージのクローン
+    ```sh 
     $ git clone https://github.com/chakio/openpose_ros.git
 * ビルド
     ```sh 
