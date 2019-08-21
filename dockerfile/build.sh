@@ -1,1 +1,2 @@
-docker build --tag ros:ros-openpose .
+cd ../../
+docker build  -t ros:ros-openpose  -f openpose_ros/dockerfile/Dockerfile .

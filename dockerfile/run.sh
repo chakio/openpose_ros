@@ -6,6 +6,7 @@ docker run -it \
 --env="QT_X11_NO_MITSHM=1" \
 --rm \
 -v $HOME/.Xauthority:/root/.Xauthority \
+-v $PWD/../../openpose_ros/:/catkin_ws/src/openpose_ros/ \
 --privileged \
 --net host \
 ros:ros-openpose \

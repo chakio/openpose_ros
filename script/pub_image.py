@@ -41,48 +41,15 @@ except:
     
 # 点の座標を定義するフレームの名前
 
-# PointCloud2のフィールドの一覧
-FIELDS = [
-    # 点の座標(x, y, z)
-    PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
-    PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
-    PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
-    # 点の色(RGB)
-    # 赤: 0xff0000, 緑:0x00ff00, 青: 0x0000ff
-    PointField(name='rgb', offset=12, datatype=PointField.UINT32, count=1),
-    
-    # 独自に定義したフィールド
-    ##　何番目の人か 
-    PointField(name='person_num', offset=16, datatype=PointField.FLOAT32, count=1),
-    ##　関節番号
-    PointField(name='joint_num', offset=20, datatype=PointField.FLOAT32, count=1),
-    ##　信頼度
-    PointField(name='confidence', offset=24, datatype=PointField.FLOAT32, count=1),
-    ##　画素の位置(x)
-    PointField(name='image_x', offset=28, datatype=PointField.FLOAT32, count=1),
-    ##　画素の位置(y)
-    PointField(name='image_y', offset=32, datatype=PointField.FLOAT32, count=1),
-]
 ################################################################################
 #                             Grobal Definition                                #
 ################################################################################
-# ロボット機能の初期化 ----------------------------------------------------------
-"""
-robot       = hsrb_interface.Robot()
-omni_base   = robot.get('omni_base')
-whole_body  = robot.get('whole_body')
-gripper     = robot.get('gripper')
-tts         = robot.get('default_tts')
-"""
 
 subscribedTime  = 0
 getImage        = False
 getPcd          = False
 first           = True
-openpose_start  = False
-picture         = False
-interval        = 0
-starttime       = 0
+
 
 def generatePcd(keypoints,pcd):
     global subscribedTime
@@ -120,37 +87,6 @@ def imageCB(data):
 
     except CvBridgeError as e:
         print('Cv_Bridge_Error')
-    
-def pcdCB(data):
-    #print('pcdCB')
-    global pcdData
-    global getPcd
-    global subscribedTime
-    global interval
-    pcdData         = data
-    getPcd          = True
-    subscribedTime  = rospy.Time.now() 
-    interval = rospy.get_time()
-    #print (subscribedTime)
-
-def startCB(data):
-    global openpose_start
-    global picture
-    if data.data=="start":
-        print "--------------Openpose Start--------------"
-        framenum=0
-        openpose_start=True
-        status_pub.publish(True)
-    if data.data=="picture_start":
-        print "--------------Openpose Picture Start--------------"
-        framenum=0
-        openpose_start=True
-        picture = True
-        status_pub.publish(True)
-    elif data.data=="end":
-        print "--------------Openpose End--------------"
-        openpose_start=False
-        picture = False
 
 
 if __name__ == '__main__':
@@ -160,11 +96,8 @@ if __name__ == '__main__':
     bridge      = CvBridge()
 
     image_sub   = rospy.Subscriber("/camera/rgb/image_raw", Image, imageCB)
-    pcd_sub     = rospy.Subscriber("/camera/depth_registered/points", PointCloud2, pcdCB)
-    start_Sub   = rospy.Subscriber("/hsr_openpose_start", String, startCB)
-    pcd_pub     = rospy.Publisher('/hsr_openpose_joints', PointCloud2, queue_size=3)
-    status_pub  = rospy.Publisher('/hsr_openpose_status', Bool, queue_size=10)
-    image_pub = rospy.Publisher("/hsr_openpose_image",Image)
+    image_pub = rospy.Publisher("/openpose_image",Image)
+
     params      = dict()
     params["logging_level"] = 3
     params["output_resolution"] = "-1x-1"
@@ -182,50 +115,23 @@ if __name__ == '__main__':
     # Construct OpenPose object allocates GPU memory
     openpose = OpenPose(params)
     print "--------------Openpose wakeup--------------"
-    r = rospy.Rate(5) # 10hz
-    tflistener=tf.TransformListener()
-    interval = rospy.get_time()
-    starttime = rospy.get_time()
+    r = rospy.Rate(10) # 10hz
     while not rospy.is_shutdown():
         if first:
-            #tts.say("open pose start")
             first = False
-        if rospy.get_time()-interval>5:
-            #tts.say("カメラ画像が取得できません")
-            rospy.sleep(5)
-        """
-        if rospy.get_time()-starttime>5:
-            try:
-                (trans,rot)=tflistener.lookupTransform('/camera_link','/base_link',rospy.Time(0))
-            except:
-                #tts.say("TFが取得できません")
-                rospy.sleep(5)
-        """
-        if getImage and getPcd and openpose_start:
-            pcdDataNow=pcdData
+        if getImage:#process updated image only
             keypoints, output_image = openpose.forward(original_image, True)
             #print(keypoints)
             #opPcd=generatePcd(keypoints,pcdDataNow)
             cv2.imshow("output", output_image)
             cv2.waitKey(1)
-            if opPcd:
-                #framenum +=1
-                pcd_pub.publish(opPcd)
-                now = datetime.datetime.now()
-                #filename = '
-                #filename = '/home/ytnpc2018b/openposeresult/'+str(framenum)+".jpg"
-                #print filename
-                #3cv2.imwrite(filename,output_image )
-                cv2.imshow("output", output_image)
-                cv2.waitKey(1)
-                if picture:
-                    try:
-                        image_pub.publish(self.bridge.cv2_to_imgmsg(output_image, "bgr8"))
-                    except CvBridgeError as e:
-                        print(e)
-            r.sleep()
-            
+            try:
+                image_pub.publish(bridge.cv2_to_imgmsg(output_image, "bgr8"))
+                print "--------------pub image--------------"
+            except CvBridgeError as e:
+                print(e)
             getImage=False
+        r.sleep()
 
 
 

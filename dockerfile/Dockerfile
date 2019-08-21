@@ -108,7 +108,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # setup entrypoint
-COPY ./ros_entrypoint.sh /
+COPY ./openpose_ros/dockerfile/ros_entrypoint.sh /
 
 ENTRYPOINT ["/ros_entrypoint.sh"]
 CMD ["bash"]
@@ -151,23 +151,25 @@ RUN apt-get install -y libopencv-dev \
       ros-kinetic-amcl \
       ros-kinetic-teleop-twist-joy \
       ros-kinetic-ros-numpy
+# install openni2
+RUN apt-get install -y ros-kinetic-rgbd-launch \
+   ros-kinetic-openni2-camera \
+   ros-kinetic-openni2-launch
 
 #######################################################################
 ##                          make catkin_ws                           ##
 #######################################################################
-ADD https://api.github.com/repos/chakio/openpose_ros/git/refs/heads/master version.json
 RUN mkdir -p /catkin_ws/src && \
    cd /catkin_ws/src && \
-   /bin/bash -c 'source /opt/ros/kinetic/setup.bash;catkin_init_workspace' && \
-   cd /catkin_ws && \
-   /bin/bash -c 'source /opt/ros/kinetic/setup.bash;catkin_make' && \
-   cd /catkin_ws/src && \
-   git clone https://github.com/chakio/openpose_ros.git && \
-   cd /catkin_ws && \
+   /bin/bash -c 'source /opt/ros/kinetic/setup.bash;catkin_init_workspace'  && \
+   cd /catkin_ws/ && \
+   /bin/bash -c 'source /opt/ros/kinetic/setup.bash;catkin_make'
+
+RUN cd /catkin_ws && \
    /bin/bash -c 'source /opt/ros/kinetic/setup.bash;catkin_make'
 
 RUN echo "source /catkin_ws/devel/setup.bash" >> ~/.bashrc
-COPY ./catkin_entrypoint.sh /
+COPY ./openpose_ros/dockerfile/catkin_entrypoint.sh /
 ENTRYPOINT ["/catkin_entrypoint.sh"]
 CMD ["bash"]
 
