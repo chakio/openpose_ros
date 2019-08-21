@@ -1,9 +1,10 @@
 ## Description
-ubuntuをベースにROSとGUI表示の環境を構築するdockerfileです。
+openposeをROS上で動かすためのdockerfileです。
 
 ## Requirement
 * docker
 * NVIDIAのGPU
+* Xtion pro live
 
 ## Usage
 * nvidia-docker2のインストール 
@@ -33,20 +34,15 @@ ubuntuをベースにROSとGUI表示の環境を構築するdockerfileです。
     * 確認
         ```sh 
         $ docker run --runtime=nvidia --rm nvidia/cuda nvidia-smi
-* ホストマシンにROS用のパッケージのセッティング
-    * catkin_ws/srcをホストマシンに作成
-    * catkin_ws/srcにROS用のパッケージをコピー
-    * dockerfileの72行目をコメントアウト(まだ/catkin_ws/devel/setup.bashが存在しないため)
-    * 一旦 docker run
-        * ./build.shでdocker build
-        * ./run.shでdocker run
-    * catkin_wsのcatkin_init_workspace
-    * catkin_make(まだ/catkin_ws/devel/setup.bashが作成される)
-* ROS用のパッケージのセッティング後
-    * dockerfileの72行目のコメントアウトを解除
-    * ./build.shでdocker build
-    * ./run.shでdocker run
-    * 使用状況に応じて、dockerfileの後半部分のrosの設定を変更
-
+* ビルド
+    ```sh 
+    $ cd /path/to/openpose_ros/dockerfile
+    $ ./build
+* 実行   
+    * xtion pro liveをPCに接続して、以下のコマンドを実行
+    ```sh 
+    $ cd /path/to/openpose_ros/dockerfile
+    $ ./run
+    $ roslaunch openpose_ros openpose_ros.launch
 ## Author
 [chakio](https://github.com/chakio)
