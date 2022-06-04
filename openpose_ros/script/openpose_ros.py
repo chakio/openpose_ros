@@ -80,7 +80,7 @@ class OpenposeRos:
 
         params = dict()
         params["model_folder"] ="/openpose/models/"
-        params["net_resolution"] ="-1x256"
+        params["net_resolution"] ="-1x144"
         # Starting OpenPose
         self.opWrapper = op.WrapperPython()
         self.opWrapper.configure(params)
@@ -100,6 +100,8 @@ class OpenposeRos:
             # depth_img = cv2.blur(depth_img,(50,50))
             # depth_img = cv2.medianBlur(depth_img, 5)
             depth_img = cv2.dilate(depth_img,kernel)
+            # print(depth_msg.header)
+            # print(color_msg.header)
             self.get3DPose(poseKeypoints, depth_img, self.camera_model, depth_msg.header)
 
     def getPose(self, colorMsg):
@@ -141,7 +143,7 @@ class OpenposeRos:
                 y_index = round(jointData[1])
                 # print(depth_img.shape)
                 if depth_img.shape[1] > x_index and depth_img.shape[0] > y_index:
-                    print("人番号："+str(personNum)+", 関節番号："+str(jointNum)+", x："+str(jointData[0])+", y："+str(jointData[1])+", depth："+str(depth_img[y_index,x_index])+", confidence："+str(jointData[2])) 
+                    # print("人番号："+str(personNum)+", 関節番号："+str(jointNum)+", x："+str(jointData[0])+", y："+str(jointData[1])+", depth："+str(depth_img[y_index,x_index])+", confidence："+str(jointData[2])) 
 
                     depth = depth_img[y_index,x_index]
                     x = (x_index - center_x) * depth * constant_x
