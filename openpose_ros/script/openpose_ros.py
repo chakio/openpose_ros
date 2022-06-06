@@ -44,9 +44,6 @@ FIELDS = [
     PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
     PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
     PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
-    # 点の色(RGB)
-    # 赤: 0xff0000, 緑:0x00ff00, 青: 0x0000ff
-    PointField(name='rgb', offset=12, datatype=PointField.UINT32, count=1),
     
     # 独自に定義したフィールド
     ##　何番目の人か 
@@ -55,10 +52,6 @@ FIELDS = [
     PointField(name='joint_num', offset=20, datatype=PointField.FLOAT32, count=1),
     ##　信頼度
     PointField(name='confidence', offset=24, datatype=PointField.FLOAT32, count=1),
-    ##　画素の位置(x)
-    PointField(name='image_x', offset=28, datatype=PointField.FLOAT32, count=1),
-    ##　画素の位置(y)
-    PointField(name='image_y', offset=32, datatype=PointField.FLOAT32, count=1),
 ]
 
 class OpenposeRos:
@@ -102,8 +95,10 @@ class OpenposeRos:
             depth_img = cv2.dilate(depth_img,kernel)
             # print(depth_msg.header)
             # print(color_msg.header)
-            self.get3DPose(poseKeypoints, depth_img, self.camera_model, depth_msg.header)
-
+            pose_pcd = self.get3DPose(poseKeypoints, depth_img, self.camera_model, depth_msg.header)
+            if pose_pcd is not None:
+                self.publish3DPose(pose_pcd)
+                
     def getPose(self, colorMsg):
         try:
             cv_image = self.bridge.imgmsg_to_cv2(colorMsg, "bgr8")
@@ -126,44 +121,48 @@ class OpenposeRos:
         genPoints=[]
         minimumConfidence=0.01
 
-        # points=ros_numpy.numpify(pcd)
-        #points = pc2.read_points(pcd,field_names = ("x", "y", "z"))
-
         center_x = camera_model.cx()
         center_y = camera_model.cy()
         unit_scaling = 0.001
         constant_x = unit_scaling / camera_model.fx()
         constant_y = unit_scaling / camera_model.fy()
-
     
         for personNum,personData in enumerate(keypoints):
             for jointNum,jointData in enumerate(personData):
-               
+                if minimumConfidence>jointData[2]:
+                    continue
                 x_index = round(jointData[0])
                 y_index = round(jointData[1])
                 # print(depth_img.shape)
-                if depth_img.shape[1] > x_index and depth_img.shape[0] > y_index:
-                    # print("人番号："+str(personNum)+", 関節番号："+str(jointNum)+", x："+str(jointData[0])+", y："+str(jointData[1])+", depth："+str(depth_img[y_index,x_index])+", confidence："+str(jointData[2])) 
+                if depth_img.shape[1] > x_index:
+                    x_index = depth_img.shape[1] - 1
+                if depth_img.shape[0] > y_index:
+                    y_index = depth_img.shape[0] - 1
 
-                    depth = depth_img[y_index,x_index]
-                    x = (x_index - center_x) * depth * constant_x
-                    y = (y_index - center_y) * depth * constant_y
-                    z = depth/1000.0
+                # print("人番号："+str(personNum)+", 関節番号："+str(jointNum)+", x："+str(jointData[0])+", y："+str(jointData[1])+", depth："+str(depth_img[y_index,x_index])+", confidence："+str(jointData[2])) 
 
+                depth = depth_img[y_index,x_index]
+                x = (x_index - center_x) * depth * constant_x
+                y = (y_index - center_y) * depth * constant_y
+                z = depth/1000.0
 
-                    #print(str(points[int(index)][0])+","+str(points[int(index)][1])+","+str(points[int(index)][2]))
-                    if minimumConfidence<jointData[2] and z>0 : #and not math.isnan(points[int(index)][0]) and not math.isnan(points[int(index)][1]) and not math.isnan(points[int(index)][2]): 
-                        # [x, y, z, rgb, humanNum, jointNum]
-                        #genPoint=[points[int(index)][0],points[int(index)][1],points[int(index)][2],0xff0000,personNum,jointNum,jointData[2]]
-                        genPoint=[x,y,z,0xff0000,personNum,jointNum,jointData[2],jointData[1] ,jointData[0] ]
-                        genPoints.append(genPoint)
-                else:
-                    print(x_index, y_index)
+                if z<=0:
+                    continue 
+                  
+                genPoint=[x,y,z,personNum,jointNum,jointData[2] ]
+                genPoints.append(genPoint)
+
         if len(genPoints)>0:
             HEADER = Header(frame_id=header.frame_id,stamp=header.stamp)
-            genPCD=pc2.create_cloud(HEADER,FIELDS, genPoints)
-            self.pcd_pub.publish(genPCD)
-            return genPCD
+            pose_pcd=pc2.create_cloud(HEADER,FIELDS, genPoints)
+            return pose_pcd
+        else:
+            return None
+
+    def publish3DPose(self, pose_pcd_):
+        self.pcd_pub.publish(pose_pcd_)
+        
+            
     
 
 if __name__ == '__main__':
